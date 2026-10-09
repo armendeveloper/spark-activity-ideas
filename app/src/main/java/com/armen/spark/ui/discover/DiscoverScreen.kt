@@ -29,6 +29,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -51,9 +52,17 @@ fun DiscoverScreen(viewModel: DiscoverViewModel, snackbarHostState: SnackbarHost
         viewModel.messages.collect { snackbarHostState.showSnackbar(it) }
     }
     val f = state.filters
+    val scroll = rememberScrollState()
+    // A new card (or the no-match message) appears below the filters; bring it fully into view.
+    LaunchedEffect(state.current?.id, state.noMatch) {
+        if (state.current != null || state.noMatch) {
+            withFrameNanos { } // wait for the card to be laid out so maxValue is up to date
+            scroll.animateScrollTo(scroll.maxValue)
+        }
+    }
 
     Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+        modifier = Modifier.fillMaxSize().verticalScroll(scroll).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text("What should I do?", style = MaterialTheme.typography.headlineMedium)
