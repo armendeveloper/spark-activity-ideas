@@ -35,6 +35,8 @@ import com.armen.spark.ui.discover.DiscoverScreen
 import com.armen.spark.ui.discover.DiscoverViewModel
 import com.armen.spark.ui.edit.EditIdeaScreen
 import com.armen.spark.ui.edit.EditIdeaViewModel
+import com.armen.spark.ui.history.HistoryScreen
+import com.armen.spark.ui.history.HistoryViewModel
 import com.armen.spark.ui.saved.SavedScreen
 import com.armen.spark.ui.saved.SavedViewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -111,7 +113,9 @@ fun SparkNavHost(
                     onBack = { navController.popBackStack() },
                 )
             }
-            composable(Tab.HISTORY.route) { Text("History") }
+            composable(Tab.HISTORY.route) {
+                HistoryScreen(viewModel { HistoryViewModel(container.ideaRepository) })
+            }
             composable(Tab.SETTINGS.route) { Text("Settings") }
         }
     }
