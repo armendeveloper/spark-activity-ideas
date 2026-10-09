@@ -24,6 +24,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -31,6 +33,10 @@ import androidx.navigation.compose.rememberNavController
 import com.armen.spark.AppContainer
 import com.armen.spark.ui.discover.DiscoverScreen
 import com.armen.spark.ui.discover.DiscoverViewModel
+import com.armen.spark.ui.edit.EditIdeaScreen
+import com.armen.spark.ui.edit.EditIdeaViewModel
+import com.armen.spark.ui.saved.SavedScreen
+import com.armen.spark.ui.saved.SavedViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 private enum class Tab(val route: String, val label: String, val icon: ImageVector) {
@@ -39,6 +45,8 @@ private enum class Tab(val route: String, val label: String, val icon: ImageVect
     HISTORY("history", "History", Icons.AutoMirrored.Filled.List),
     SETTINGS("settings", "Settings", Icons.Filled.Settings),
 }
+
+private const val EDIT_ROUTE = "edit?id={id}"
 
 @Composable
 fun SparkNavHost(
@@ -86,7 +94,23 @@ fun SparkNavHost(
             modifier = Modifier.padding(padding).consumeWindowInsets(padding),
         ) {
             composable(Tab.DISCOVER.route) { DiscoverScreen(discoverViewModel, snackbarHostState) }
-            composable(Tab.SAVED.route) { Text("Saved") }
+            composable(Tab.SAVED.route) {
+                SavedScreen(
+                    viewModel = viewModel { SavedViewModel(container.ideaRepository) },
+                    onAdd = { navController.navigate("edit") },
+                    onEdit = { id -> navController.navigate("edit?id=$id") },
+                )
+            }
+            composable(
+                route = EDIT_ROUTE,
+                arguments = listOf(navArgument("id") { type = NavType.LongType; defaultValue = -1L }),
+            ) { entry ->
+                val id = entry.arguments?.getLong("id")?.takeIf { it > 0 }
+                EditIdeaScreen(
+                    viewModel = viewModel { EditIdeaViewModel(container.ideaRepository, id) },
+                    onBack = { navController.popBackStack() },
+                )
+            }
             composable(Tab.HISTORY.route) { Text("History") }
             composable(Tab.SETTINGS.route) { Text("Settings") }
         }
