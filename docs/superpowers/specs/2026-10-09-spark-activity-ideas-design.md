@@ -177,3 +177,9 @@ app/src/main/java/com/armen/spark/
 app/src/main/assets/activities.json
 app/src/test/java/com/armen/spark/...
 ```
+
+## 11. Implementation notes (added during planning)
+
+- In code the domain type is `Idea` (with `IdeaPicker` and `IdeaRepository`), to avoid clashing with `android.app.Activity`.
+- The Saved tab lists favorites **and** every custom idea, so un-hearting one of your own ideas never makes it unreachable.
+- Discover's Time chips are "15 min" and "Up to 1 h", and its Budget chips are "Free" and "Cheap". Leaving a row unselected means "any".
