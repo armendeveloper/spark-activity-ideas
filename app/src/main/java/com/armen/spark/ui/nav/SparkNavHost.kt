@@ -39,6 +39,8 @@ import com.armen.spark.ui.history.HistoryScreen
 import com.armen.spark.ui.history.HistoryViewModel
 import com.armen.spark.ui.saved.SavedScreen
 import com.armen.spark.ui.saved.SavedViewModel
+import com.armen.spark.ui.settings.SettingsScreen
+import com.armen.spark.ui.settings.SettingsViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 private enum class Tab(val route: String, val label: String, val icon: ImageVector) {
@@ -116,7 +118,9 @@ fun SparkNavHost(
             composable(Tab.HISTORY.route) {
                 HistoryScreen(viewModel { HistoryViewModel(container.ideaRepository) })
             }
-            composable(Tab.SETTINGS.route) { Text("Settings") }
+            composable(Tab.SETTINGS.route) {
+                SettingsScreen(viewModel { SettingsViewModel(container.settingsRepository, container.scheduler) })
+            }
         }
     }
 }
