@@ -136,8 +136,10 @@ Bottom navigation: **Discover · Saved · History · Settings**. The add/edit fo
 - `DailyIdeaWorker` (a `CoroutineWorker`): picks an idea with empty filters and the done-history weighting,
   then posts a notification on the `daily_idea` channel. Tapping it opens Discover with that idea showing
   (via an intent extra `activityId`).
-- `DailyIdeaScheduler`: schedules a unique `PeriodicWorkRequest` (24 h) whose initial delay lands on the
-  chosen time. It reschedules (REPLACE) whenever the time changes, and cancels when the toggle is turned off.
+- `DailyIdeaScheduler`: schedules a unique one-time request whose delay lands on the next occurrence of the
+  chosen time. When it finishes, the worker queues the next day's run (APPEND_OR_REPLACE), so the time never
+  drifts across DST changes or because a job ran late. Changing the time reschedules (REPLACE), and turning the
+  toggle off cancels it. (This replaced a fixed 24 h periodic request after the final review.)
 - **Permission:** on Android 13+, turning the toggle on requests `POST_NOTIFICATIONS`. If the user denies it,
   the toggle goes back to off and a short explanation is shown.
 

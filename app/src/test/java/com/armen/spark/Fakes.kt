@@ -5,13 +5,19 @@ import com.armen.spark.data.IdeaRepository
 import com.armen.spark.domain.Filters
 import com.armen.spark.domain.HistoryItem
 import com.armen.spark.domain.Idea
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.yield
 
-class FakeIdeaRepository(initial: List<Idea> = emptyList()) : IdeaRepository {
+/** [seed] is loaded by [seedIfEmpty] once [seedGate] (if any) completes, like the real first-launch import. */
+class FakeIdeaRepository(
+    initial: List<Idea> = emptyList(),
+    private val seed: List<Idea> = emptyList(),
+    private val seedGate: CompletableDeferred<Unit>? = null,
+) : IdeaRepository {
     val ideaFlow = MutableStateFlow(initial)
     val historyFlow = MutableStateFlow(emptyList<HistoryItem>())
     val doneIds = mutableListOf<Long>()
@@ -34,7 +40,10 @@ class FakeIdeaRepository(initial: List<Idea> = emptyList()) : IdeaRepository {
     override suspend fun deleteCustom(id: Long) {
         ideaFlow.update { list -> list.filterNot { it.id == id } }
     }
-    override suspend fun seedIfEmpty() = Unit
+    override suspend fun seedIfEmpty() {
+        seedGate?.await()
+        if (ideaFlow.value.isEmpty()) ideaFlow.value = seed
+    }
 }
 
 class FakeFilterStore(initial: Filters = Filters()) : FilterStore {

@@ -59,6 +59,7 @@ class DiscoverViewModel(
 
     fun spark() {
         viewModelScope.launch {
+            repository.seedIfEmpty() // on first launch, wait for the bundled ideas instead of reporting "no match"
             val idea = picker.pick(
                 candidates = repository.allIdeas(),
                 filters = filters.value,

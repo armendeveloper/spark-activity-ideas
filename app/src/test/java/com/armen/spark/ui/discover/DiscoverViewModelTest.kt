@@ -8,6 +8,7 @@ import com.armen.spark.domain.Energy
 import com.armen.spark.domain.Filters
 import com.armen.spark.domain.IdeaPicker
 import com.armen.spark.testIdea
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -99,6 +100,18 @@ class DiscoverViewModelTest {
 
         assertEquals(listOf(1L), repo.doneIds)
         assertEquals(1, messages.size)
+    }
+
+    @Test
+    fun sparkOnFirstLaunchWaitsForTheSeedInsteadOfReportingNoMatch() = runTest {
+        val seeding = CompletableDeferred<Unit>()
+        val vm = viewModel(FakeIdeaRepository(seed = listOf(chill), seedGate = seeding))
+
+        vm.spark() // tapped while the bundled ideas are still being imported
+        seeding.complete(Unit)
+
+        assertFalse(vm.uiState.value.noMatch)
+        assertEquals(1L, vm.uiState.value.current?.id)
     }
 
     @Test
