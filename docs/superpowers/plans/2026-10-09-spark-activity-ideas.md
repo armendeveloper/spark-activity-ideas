@@ -17,7 +17,7 @@
 - Package and applicationId `com.armen.spark`; app label `Spark`.
 - minSdk 26, targetSdk 36, compileSdk 36; Java/Kotlin JVM target 17 (built with the installed JDK 21).
 - No network access, no accounts, English only.
-- The Android SDK is at `C:\Users\armen\AppData\Local\Android\Sdk` (put it in `local.properties`, which is gitignored).
+- Point `local.properties` (gitignored) at your Android SDK.
 - At least 150 seed ideas, using exactly these categories: Creative, Outdoors, Social, Learning, Food, Mindful, Games, Home.
 - Recently done = within 14 days → weight 0.2; otherwise 1.0.
 - The default daily-notification time is 09:00, and it is off by default.
@@ -143,7 +143,7 @@ kotlin.code.style=official
 
 `local.properties`:
 ```properties
-sdk.dir=C\:\\Users\\armen\\AppData\\Local\\Android\\Sdk
+sdk.dir=<path to your Android SDK>
 ```
 
 `.gitignore`:
